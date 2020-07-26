@@ -14,19 +14,31 @@ public enum HungerState
 
 public class Animal : MonoBehaviour
 {
-    [Header("Hunger Stats")]
+    [Header("Hunger")]
     public Text hungerStateText;
-    [Range(0, 10)]
+    [Range(0, 100)]
     public float hunger = 0f;
     [Range(0, 10)]
     public float hungerRate = 1f; //per second rate at which animal becomes hungry
     public HungerState hungerState;
 
-    private float hungryCutoff = 3f; //hunger value above which animal becomes hungry
-    private float starvingCutoff = 7f; //hunger value above which animal becomes starving
-    private float starvedCutoff = 10f; //hunger value above which animal dies from starvation
+    [Header("Movement")]
+    public float moveForce;
+    public float minTimeDirChange = 2f;
+    public float maxTimeDirChange = 4f;
+    public float maxMoveAngleChange = 30f;
+
+    private float hungryCutoff = 30f; //hunger value above which animal becomes hungry
+    private float starvingCutoff = 70f; //hunger value above which animal becomes starving
+    private float starvedCutoff = 100f; //hunger value above which animal dies from starvation
     private bool isAlive;
 
+    private Rigidbody rb;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     private void Start()
     {
@@ -38,8 +50,10 @@ public class Animal : MonoBehaviour
         hunger = 0f;
         isAlive = true;
         StartCoroutine(HandleHunger());
+        Wander();
     }
 
+    #region Hunger Methods --------------------
     private IEnumerator HandleHunger()
     {
         ChangeHungerState(HungerState.FED);
@@ -108,6 +122,32 @@ public class Animal : MonoBehaviour
         hungerState = HungerState.STARVED;
         hungerStateText.text = "Starved";
         Die();
+    }
+    #endregion
+
+    private void Wander()
+    {
+        StartCoroutine(MoveRandomly());
+    }
+
+    private IEnumerator MoveRandomly()
+    {
+        Vector3 moveVector = transform.right * moveForce;
+        float randomAngle;
+        while (isAlive)
+        {
+            randomAngle = Random.Range(-maxMoveAngleChange, maxMoveAngleChange);
+            Debug.Log("Move Angle: " + randomAngle);
+            moveVector = CalculateRotationDir(moveVector, randomAngle);
+            rb.velocity = (moveVector);
+            yield return new WaitForSeconds(Random.Range(minTimeDirChange, maxTimeDirChange));
+        }
+    }
+
+    private Vector3 CalculateRotationDir(Vector3 dir, float angle)
+    {
+        float radAngle = angle * Mathf.Deg2Rad;
+        return new Vector3(dir.z * Mathf.Sin(radAngle) + dir.x * Mathf.Cos(radAngle), 0, dir.z * Mathf.Cos(radAngle) - dir.x * Mathf.Sin(radAngle));
     }
 
     private void Die()
