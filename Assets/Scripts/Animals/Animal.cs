@@ -48,6 +48,8 @@ public class Animal : MonoBehaviour
     private float starvedCutoff = 100f; //hunger value above which animal dies from starvation
     private bool isAlive;
 
+    private Vector3 moveDir;
+
     private Coroutine moveRandomlyCoroutine;
 
     private Rigidbody rb;
@@ -67,6 +69,11 @@ public class Animal : MonoBehaviour
         SearchFood();
     }
 
+    private void FixedUpdate()
+    {
+        SimpleMoveInDir(moveDir);
+    }
+
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.tag == "Plant") //TODO: for testing rn, update this later
@@ -75,7 +82,7 @@ public class Animal : MonoBehaviour
         }
         if (other.gameObject.tag == "Wall")
         {
-            SimpleMoveInDir(other.contacts[0].normal);
+            moveDir = (other.contacts[0].normal);
         }
     }
 
@@ -171,21 +178,24 @@ public class Animal : MonoBehaviour
 
     private IEnumerator MoveRandomly()
     {
-        Vector3 moveDir = transform.right;
+        moveDir = transform.right;
         float randomAngle;
         while (isAlive && foodSearchState == FoodSearchState.SEARCHING)
         {
             randomAngle = Random.Range(-maxMoveAngleChange, maxMoveAngleChange);
             // Debug.Log("Move Angle: " + randomAngle);
             moveDir = CalculateRotationDir(moveDir, randomAngle);
-            SimpleMoveInDir(moveDir);
+            // SimpleMoveInDir(moveDir);
             yield return new WaitForSeconds(Random.Range(minTimeDirChange, maxTimeDirChange));
         }
     }
 
     private void SimpleMoveInDir(Vector3 moveDir)
     {
-        rb.velocity = moveDir * moveSpeed;
+        if (isAlive)
+        {
+            rb.velocity = moveDir * moveSpeed;
+        }
     }
 
     private Vector3 CalculateRotationDir(Vector3 dir, float angle)
@@ -220,11 +230,11 @@ public class Animal : MonoBehaviour
 
     private void FollowFood(Vector3 foodPosition)
     {
-        Vector3 moveDir = Vector3.Normalize(foodPosition - transform.position);
+        moveDir = Vector3.Normalize(foodPosition - transform.position);
         // moveDir.y = 0f;
 
-        Debug.Log("Follow Food Dir: " + moveDir);
-        SimpleMoveInDir(moveDir);
+        // Debug.Log("Follow Food Dir: " + moveDir);
+        // SimpleMoveInDir(moveDir);
     }
 
     private void EatFood(GameObject foodObj) //TODO: for testing rn, update this function later
