@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 // using TMPro;
 using UnityEngine.UI;
 
@@ -47,6 +48,8 @@ public class Animal : MonoBehaviour
     private float starvedCutoff = 100f; //hunger value above which animal dies from starvation
     private bool isAlive;
 
+    private Coroutine moveRandomlyCoroutine;
+
     private Rigidbody rb;
 
     private void Awake()
@@ -62,6 +65,18 @@ public class Animal : MonoBehaviour
     private void Update()
     {
         SearchFood();
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.tag == "Plant") //TODO: for testing rn, update this later
+        {
+            EatFood(other.gameObject);
+        }
+        if (other.gameObject.tag == "Wall")
+        {
+            SimpleMoveInDir(other.contacts[0].normal);
+        }
     }
 
     private void Init()
@@ -147,7 +162,11 @@ public class Animal : MonoBehaviour
     #region Movement Methods -----------------------
     private void Wander()
     {
-        StartCoroutine(MoveRandomly());
+        if (moveRandomlyCoroutine != null)
+        {
+            StopCoroutine(moveRandomlyCoroutine);
+        }
+        moveRandomlyCoroutine = StartCoroutine(MoveRandomly());
     }
 
     private IEnumerator MoveRandomly()
@@ -157,14 +176,14 @@ public class Animal : MonoBehaviour
         while (isAlive && foodSearchState == FoodSearchState.SEARCHING)
         {
             randomAngle = Random.Range(-maxMoveAngleChange, maxMoveAngleChange);
-            Debug.Log("Move Angle: " + randomAngle);
+            // Debug.Log("Move Angle: " + randomAngle);
             moveDir = CalculateRotationDir(moveDir, randomAngle);
-            SimpleMove(moveDir);
+            SimpleMoveInDir(moveDir);
             yield return new WaitForSeconds(Random.Range(minTimeDirChange, maxTimeDirChange));
         }
     }
 
-    private void SimpleMove(Vector3 moveDir)
+    private void SimpleMoveInDir(Vector3 moveDir)
     {
         rb.velocity = moveDir * moveSpeed;
     }
@@ -189,8 +208,11 @@ public class Animal : MonoBehaviour
             }
             else
             {
-                foodSearchState = FoodSearchState.SEARCHING;
-                Wander();
+                if (foodSearchState != FoodSearchState.SEARCHING)
+                {
+                    foodSearchState = FoodSearchState.SEARCHING;
+                    Wander();
+                }
             }
         }
         //TODO: add if hunger 0 don't search for food but keep wandering
@@ -198,13 +220,28 @@ public class Animal : MonoBehaviour
 
     private void FollowFood(Vector3 foodPosition)
     {
-        Vector3 moveDir = Vector3.MoveTowards(transform.position, foodPosition, 1f);
-        SimpleMove(moveDir);
+        Vector3 moveDir = Vector3.Normalize(foodPosition - transform.position);
+        // moveDir.y = 0f;
+
+        Debug.Log("Follow Food Dir: " + moveDir);
+        SimpleMoveInDir(moveDir);
+    }
+
+    private void EatFood(GameObject foodObj) //TODO: for testing rn, update this function later
+    {
+        hunger = 0;
+        foodObj.SetActive(false);
     }
     #endregion
 
     private void Die()
     {
         isAlive = false;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Handles.color = Color.red;
+        Handles.DrawWireDisc(transform.position, Vector3.up, searchRadius);
     }
 }
