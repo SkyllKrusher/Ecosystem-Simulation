@@ -12,8 +12,17 @@ public enum HungerState
     STARVED
 }
 
+public enum FoodSearchState
+{
+    SEARCHING,
+    FOUND
+}
+
 public class Animal : MonoBehaviour
 {
+    [Header("Stats")]
+    //stats such as self energy, speed, search radius. 10 percent of self energy passes to predator
+
     [Header("Hunger")]
     public Text hungerStateText;
     [Range(0, 100)]
@@ -23,10 +32,15 @@ public class Animal : MonoBehaviour
     public HungerState hungerState;
 
     [Header("Movement")]
-    public float moveForce;
+    public float moveSpeed;
     public float minTimeDirChange = 2f;
     public float maxTimeDirChange = 4f;
     public float maxMoveAngleChange = 30f;
+
+    [Header("Food Gathering")]
+    public FoodSearchState foodSearchState;
+    public float searchRadius; //radius of sphere in which to search for food
+    public LayerMask foodSearchLayerMask;
 
     private float hungryCutoff = 30f; //hunger value above which animal becomes hungry
     private float starvingCutoff = 70f; //hunger value above which animal becomes starving
@@ -43,6 +57,11 @@ public class Animal : MonoBehaviour
     private void Start()
     {
         Init();
+    }
+
+    private void Update()
+    {
+        SearchFood();
     }
 
     private void Init()
@@ -125,6 +144,7 @@ public class Animal : MonoBehaviour
     }
     #endregion
 
+    #region Movement Methods -----------------------
     private void Wander()
     {
         StartCoroutine(MoveRandomly());
@@ -132,16 +152,21 @@ public class Animal : MonoBehaviour
 
     private IEnumerator MoveRandomly()
     {
-        Vector3 moveVector = transform.right * moveForce;
+        Vector3 moveDir = transform.right;
         float randomAngle;
-        while (isAlive)
+        while (isAlive && foodSearchState == FoodSearchState.SEARCHING)
         {
             randomAngle = Random.Range(-maxMoveAngleChange, maxMoveAngleChange);
             Debug.Log("Move Angle: " + randomAngle);
-            moveVector = CalculateRotationDir(moveVector, randomAngle);
-            rb.velocity = (moveVector);
+            moveDir = CalculateRotationDir(moveDir, randomAngle);
+            SimpleMove(moveDir);
             yield return new WaitForSeconds(Random.Range(minTimeDirChange, maxTimeDirChange));
         }
+    }
+
+    private void SimpleMove(Vector3 moveDir)
+    {
+        rb.velocity = moveDir * moveSpeed;
     }
 
     private Vector3 CalculateRotationDir(Vector3 dir, float angle)
@@ -149,10 +174,37 @@ public class Animal : MonoBehaviour
         float radAngle = angle * Mathf.Deg2Rad;
         return new Vector3(dir.z * Mathf.Sin(radAngle) + dir.x * Mathf.Cos(radAngle), 0, dir.z * Mathf.Cos(radAngle) - dir.x * Mathf.Sin(radAngle));
     }
+    #endregion
+
+    #region Food Gathering Methods -----------------------
+    private void SearchFood()
+    {
+        if (isAlive)
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, searchRadius, foodSearchLayerMask);
+            if (hitColliders.Length != 0)
+            {
+                foodSearchState = FoodSearchState.FOUND;
+                FollowFood(hitColliders[0].transform.position);
+            }
+            else
+            {
+                foodSearchState = FoodSearchState.SEARCHING;
+                Wander();
+            }
+        }
+        //TODO: add if hunger 0 don't search for food but keep wandering
+    }
+
+    private void FollowFood(Vector3 foodPosition)
+    {
+        Vector3 moveDir = Vector3.MoveTowards(transform.position, foodPosition, 1f);
+        SimpleMove(moveDir);
+    }
+    #endregion
 
     private void Die()
     {
         isAlive = false;
     }
-
 }
