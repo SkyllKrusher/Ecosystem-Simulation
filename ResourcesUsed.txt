@@ -1,1 +1,3 @@
 https://www.cs.helsinki.fi/group/goa/mallinnus/3dtransf/3drot.html
+
+https://stackoverflow.com/questions/50428971/unity3d-relative-offset-object-rotation-using-quaternions/50429231#50429231

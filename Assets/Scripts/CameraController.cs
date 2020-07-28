@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public class CameraController : MonoBehaviour
 {
     public Vector3 restPos;
-    public Vector3 Offset;
+    public Vector3 restRot;
+    public Vector3 offsetPos;
+    public Vector3 offsetRot;
     public bool toFollow;
     public Transform followTarget;
     public Button followBtn;
@@ -18,7 +20,7 @@ public class CameraController : MonoBehaviour
     private void Start()
     {
         toFollow = false;
-        ResetCamPosition();
+        ResetCam();
     }
 
     private void FixedUpdate()
@@ -34,12 +36,13 @@ public class CameraController : MonoBehaviour
     private void StopFollowing()
     {
         toFollow = false;
-        ResetCamPosition();
+        ResetCam();
     }
 
-    private void ResetCamPosition()
+    private void ResetCam()
     {
         Camera.main.transform.position = restPos;
+        Camera.main.transform.rotation = Quaternion.Euler(restRot);
     }
 
     private void StartFollowing(Transform target)
@@ -60,11 +63,22 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    private Vector3 CalculateRotatedPositionOffset()
+    {
+        Transform targetTransform = followTarget.transform;
+        Vector3 newCamPos;
+
+        newCamPos = (targetTransform.right * offsetPos.x + targetTransform.up * offsetPos.y + targetTransform.forward * offsetPos.z);
+        return newCamPos;
+    }
+
     public void CameraFollow()
     {
         if (toFollow)
         {
-            Camera.main.transform.position = followTarget.position + Offset;
+            // Camera.main.transform.position = followTarget.position + offsetPos;
+            Camera.main.transform.position = CalculateRotatedPositionOffset() + followTarget.transform.position;
+            Camera.main.transform.forward = followTarget.forward + offsetRot;
         }
     }
 }
