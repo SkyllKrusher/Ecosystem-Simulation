@@ -204,10 +204,7 @@ public class Animal : MonoBehaviour
         // Debug.Log(dir);
 
         transform.forward = Vector3.Lerp(transform.forward, dir, Time.fixedDeltaTime * rotateSpeed);
-
-        // Quaternion targetRot = Quaternion.identity;
-        // targetRot = Quaternion.Euler(dir);
-        // transform.forward = Quaternion.Lerp(transform.rotation, targetRot, Time.fixedDeltaTime * rotateSpeed).eulerAngles;
+        transform.rotation = Quaternion.Euler(new Vector3(0, transform.eulerAngles.y, 0));
     }
 
     private Vector3 CalculateRotationDirFromAngle(Vector3 dir, float angle)
