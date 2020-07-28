@@ -461,7 +461,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ec5ba52f7522ee4a8c726554d644288, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  restPos: {x: 0, y: 0, z: 0}
+  restPos: {x: 0, y: 63, z: -135}
   Offset: {x: 0, y: 10, z: -10}
   toFollow: 0
   followTarget: {fileID: 0}

@@ -18,7 +18,6 @@ public class CameraController : MonoBehaviour
     private void Start()
     {
         toFollow = false;
-        restPos = new Vector3(0, 63 - 137);
         ResetCamPosition();
     }
 
