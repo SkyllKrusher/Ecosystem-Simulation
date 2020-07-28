@@ -37,6 +37,7 @@ public class Animal : MonoBehaviour
     public float minTimeDirChange = 2f;
     public float maxTimeDirChange = 4f;
     public float maxMoveAngleChange = 30f;
+    public float rotateSpeed;
 
     [Header("Food Gathering")]
     public FoodSearchState foodSearchState;
@@ -178,13 +179,12 @@ public class Animal : MonoBehaviour
 
     private IEnumerator MoveRandomly()
     {
-        moveDir = transform.right;
         float randomAngle;
         while (isAlive && foodSearchState == FoodSearchState.SEARCHING)
         {
             randomAngle = Random.Range(-maxMoveAngleChange, maxMoveAngleChange);
             // Debug.Log("Move Angle: " + randomAngle);
-            moveDir = CalculateRotationDir(moveDir, randomAngle);
+            moveDir = CalculateRotationDirFromAngle(moveDir, randomAngle);
             // SimpleMoveInDir(moveDir);
             yield return new WaitForSeconds(Random.Range(minTimeDirChange, maxTimeDirChange));
         }
@@ -194,11 +194,23 @@ public class Animal : MonoBehaviour
     {
         if (isAlive)
         {
-            rb.velocity = moveDir * moveSpeed;
+            RotateInDir(moveDir);
+            rb.velocity = moveSpeed * transform.forward;
         }
     }
 
-    private Vector3 CalculateRotationDir(Vector3 dir, float angle)
+    private void RotateInDir(Vector3 dir)
+    {
+        // Debug.Log(dir);
+
+        transform.forward = Vector3.Lerp(transform.forward, dir, Time.fixedDeltaTime * rotateSpeed);
+
+        // Quaternion targetRot = Quaternion.identity;
+        // targetRot = Quaternion.Euler(dir);
+        // transform.forward = Quaternion.Lerp(transform.rotation, targetRot, Time.fixedDeltaTime * rotateSpeed).eulerAngles;
+    }
+
+    private Vector3 CalculateRotationDirFromAngle(Vector3 dir, float angle)
     {
         float radAngle = angle * Mathf.Deg2Rad;
         return new Vector3(dir.z * Mathf.Sin(radAngle) + dir.x * Mathf.Cos(radAngle), 0, dir.z * Mathf.Cos(radAngle) - dir.x * Mathf.Sin(radAngle));

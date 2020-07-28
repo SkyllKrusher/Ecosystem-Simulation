@@ -1293,7 +1293,7 @@ GameObject:
   - component: {fileID: 1065002754}
   - component: {fileID: 1065002749}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Animal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1319,6 +1319,7 @@ MonoBehaviour:
   minTimeDirChange: 1
   maxTimeDirChange: 2
   maxMoveAngleChange: 85
+  rotateSpeed: 5
   foodSearchState: 0
   searchRadius: 10
   foodSearchLayerMask:
