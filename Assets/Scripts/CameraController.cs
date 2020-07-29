@@ -33,18 +33,6 @@ public class CameraController : MonoBehaviour
         followTarget = target;
     }
 
-    private void StopFollowing()
-    {
-        toFollow = false;
-        ResetCam();
-    }
-
-    private void ResetCam()
-    {
-        Camera.main.transform.position = restPos;
-        Camera.main.transform.rotation = Quaternion.Euler(restRot);
-    }
-
     private void StartFollowing(Transform target)
     {
         SetFollowTarget(target);
@@ -72,7 +60,18 @@ public class CameraController : MonoBehaviour
         return newCamPos;
     }
 
-    public void CameraFollow()
+    public void StopFollowing()
+    {
+        toFollow = false;
+    }
+
+    public void ResetCam()
+    {
+        Camera.main.transform.position = restPos;
+        Camera.main.transform.rotation = Quaternion.Euler(restRot); // to fix
+    }
+
+    private void CameraFollow()
     {
         if (toFollow)
         {
