@@ -5,10 +5,10 @@ using UnityEngine;
 public class UIFollowTarget : MonoBehaviour
 {
     [SerializeField] private Vector3 Offset;
-    [SerializeField] private Transform followTarget;
+    private Transform followTarget;
     private Camera cam;
 
-    private void Start()
+    private void Awake()
     {
         cam = Camera.main;
     }
@@ -17,5 +17,10 @@ public class UIFollowTarget : MonoBehaviour
     {
         // transform.LookAt(cam.transform.position);
         transform.position = cam.WorldToScreenPoint(followTarget.position + Offset);
+    }
+
+    public void Init(Transform target)
+    {
+        followTarget = target;
     }
 }

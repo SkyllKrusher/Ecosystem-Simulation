@@ -25,7 +25,6 @@ public class Animal : MonoBehaviour
     //stats such as self energy, speed, search radius. 10 percent of self energy passes to predator
 
     [Header("Hunger")]
-    public Text hungerStateText;
     [Range(0, 100)]
     public float hunger = 0f;
     [Range(0, 10)]
@@ -44,6 +43,8 @@ public class Animal : MonoBehaviour
     public float searchRadius; //radius of sphere in which to search for food
     public LayerMask foodSearchLayerMask;
 
+    private AnimalUI animalUI;
+
     private float hungryCutoff = 30f; //hunger value above which animal becomes hungry
     private float starvingCutoff = 70f; //hunger value above which animal becomes starving
     private float starvedCutoff = 100f; //hunger value above which animal dies from starvation
@@ -60,10 +61,10 @@ public class Animal : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    private void Start()
-    {
-        Init();
-    }
+    // private void Start()
+    // {
+    //     Init();
+    // }
 
     private void Update()
     {
@@ -87,8 +88,9 @@ public class Animal : MonoBehaviour
         }
     }
 
-    private void Init()
+    public void Init(AnimalUI animalUI)
     {
+        this.animalUI = animalUI;
         hunger = 0f;
         isAlive = true;
         StartCoroutine(HandleHunger());
@@ -139,30 +141,27 @@ public class Animal : MonoBehaviour
                 BecomeStarved();
                 break;
         }
+        animalUI.SetHungerUI(newHungerState, hunger);
     }
 
     private void BecomeFed()
     {
         hungerState = HungerState.FED;
-        hungerStateText.text = "Fed";
     }
 
     private void BecomeHungry()
     {
         hungerState = HungerState.HUNGRY;
-        hungerStateText.text = "Hungry";
     }
 
     private void BecomeStarving()
     {
         hungerState = HungerState.STARVING;
-        hungerStateText.text = "Starving";
     }
 
     private void BecomeStarved()
     {
         hungerState = HungerState.STARVED;
-        hungerStateText.text = "Starved";
         Die();
     }
     #endregion
@@ -223,6 +222,7 @@ public class Animal : MonoBehaviour
             if (hitColliders.Length != 0)
             {
                 foodSearchState = FoodSearchState.FOUND;
+                animalUI.SetActivityStatusText("Following Food");
                 FollowFood(hitColliders[0].transform.position);
             }
             else
@@ -230,6 +230,7 @@ public class Animal : MonoBehaviour
                 if (foodSearchState != FoodSearchState.SEARCHING)
                 {
                     foodSearchState = FoodSearchState.SEARCHING;
+                    animalUI.SetActivityStatusText("Searching Food");
                     Wander();
                 }
             }
