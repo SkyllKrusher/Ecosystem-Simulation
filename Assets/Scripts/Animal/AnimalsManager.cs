@@ -2,12 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// public enum AnimalType //TODO: achieve using inheritence
+// {
+//     PREY,
+//     PREDATOR
+// }
+
 public class AnimalsManager : MonoBehaviour
 {
     private static AnimalsManager instance;
     public static AnimalsManager Instance { get { return instance; } }
 
-    [SerializeField] private GameObject animalPrefab;
+    [SerializeField] private GameObject preyAnimalPrefab;
+    [SerializeField] private GameObject predatorAnimalPrefab;
     [SerializeField] private Transform animalsParent;
     [SerializeField] private GameObject animalUIPrefab;
     [SerializeField] private Transform animalsUIParent;
@@ -18,10 +25,10 @@ public class AnimalsManager : MonoBehaviour
     {
         animals = new List<Animal>();
         animalUIs = new List<AnimalUI>();
-        NewAnimal();
+        // NewAnimal();
     }
 
-    private void NewAnimal()
+    private void NewAnimal(GameObject animalPrefab)
     {
         GameObject newAnimalGameObj = Instantiate(animalPrefab, animalsParent);
         Animal newAnimal = newAnimalGameObj.GetComponent<Animal>();
@@ -33,5 +40,15 @@ public class AnimalsManager : MonoBehaviour
 
         animals.Add(newAnimal);
         animalUIs.Add(newAnimalUI);
+    }
+
+    public void NewPrey()
+    {
+        NewAnimal(preyAnimalPrefab);
+    }
+
+    public void NewPredator()
+    {
+        NewAnimal(predatorAnimalPrefab);
     }
 }

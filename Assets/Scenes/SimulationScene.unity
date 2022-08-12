@@ -2521,7 +2521,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8fc171e27d7e904cbb3207c24824d23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animalPrefab: {fileID: 4606605146754451804, guid: a1ccd11c1d7848d4b8c45970748a01e3,
+  preyAnimalPrefab: {fileID: 6693884357440746673, guid: 248da2ef13ba0da4cbe115c903643ba3,
+    type: 3}
+  predatorAnimalPrefab: {fileID: 4296422320662621871, guid: 2a553b9fb2c18a34e978c2be5a32fca1,
     type: 3}
   animalsParent: {fileID: 1422900944}
   animalUIPrefab: {fileID: 6612308931561794352, guid: b3a070bc001862441a3d883de8851b44,

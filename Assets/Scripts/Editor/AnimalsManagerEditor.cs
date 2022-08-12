@@ -1,18 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
-public class AnimalsManagerEditor : MonoBehaviour
+[CustomEditor(typeof(AnimalsManager))]
+public class AnimalsManagerEditor : Editor
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void OnInspectorGUI()
     {
-        
-    }
+        DrawDefaultInspector();
+        AnimalsManager animalsManager = (AnimalsManager)target;
+        if (GUILayout.Button("New Prey"))
+        {
+            animalsManager.NewPrey();
+        }
+        if (GUILayout.Button("New Predator"))
+        {
+            animalsManager.NewPredator();
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
